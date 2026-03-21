@@ -10,14 +10,20 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         <!-- Styles -->
         @livewireStyles
 </head>
-<body>
+<body x-data="{
+open: false,
+}"
+:class="{
+'overflow-hidden': open,
+}"
+class="sm:overflow-auto">
     
 @include('layouts.includes.admin.sidebar')
 @include('layouts.includes.admin.navigation')
