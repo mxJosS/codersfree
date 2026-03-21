@@ -1,4 +1,12 @@
-<x-admin-layout>
+<x-admin-layout :breadcrumb="[
+    [
+        'name' => 'Dashboard',
+        'url' => '#',
+    ],
+    [
+        'name' => 'Projects',
+    ]
+]">
 
     <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Suscipit voluptas consectetur obcaecati, ducimus fugiat magnam quaerat tempora temporibus amet molestias aperiam a voluptatum laborum omnis, asperiores officiis inventore sint? Aspernatur.</p>
     <p>Ut explicabo molestiae ducimus placeat amet dignissimos repudiandae laudantium autem provident rerum perferendis quasi quod, reprehenderit est, illo numquam. Tenetur illo molestias repellendus autem commodi suscipit alias? Vero, quam tempora.</p>
