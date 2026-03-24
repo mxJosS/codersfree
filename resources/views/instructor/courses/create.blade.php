@@ -16,14 +16,14 @@
                     <x-label class="mb-1">
                         Nombre del Curso
                     </x-label>
-                    <x-input placeholder="Nombre del curso" class="w-full" name="title" value="{{old('tittle')}}"  />
+                    <x-input placeholder="Nombre del curso" class="w-full" name="title" value="{{old('tittle')}}"  oninput="string_to_slug(this.value, '#slug')" />
                 </div>
 
                 <div class="mb-4">
                     <x-label class="mb-1">
                         Slug del curso
                     </x-label>
-                    <x-input placeholder="Ej: laravel-desde-cero" class="w-full" name="slug" value="{{old('slug')}}"  />
+                    <x-input id="slug"  placeholder="Ej: laravel-desde-cero" class="w-full" name="slug" value="{{old('slug')}}"  />
                 </div>
                 <div class="grid grid-cols-3 gap-4 mb-4">
                     <div>
