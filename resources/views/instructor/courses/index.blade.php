@@ -13,13 +13,13 @@
         </div>
 
         <ul>
-            @foreach ($courses as $course)
+            @forelse ($courses as $course)
                 <li class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col md:flex-row mb-6">
                     <figure class="flex-shrink-0">
                         <img src="{{ $course->image }}" class="w-full h-48 md:h-full md:w-48 object-cover object-center">
                     </figure>
 
-                    <div class="flex-1 flex flex-col justify-center py-4 px-6 md:px-8">
+                    <a href="{{ route('instructor.courses.edit', $course) }}" class="flex-1 flex flex-col justify-center py-4 px-6 md:px-8">
                         <div class="grid grid-cols-1 md:grid-cols-9 gap-4 items-center">
 
                             <div class="col-span-1 md:col-span-3">
@@ -81,9 +81,17 @@
                         </div>
 
 
-                    </div>
+                    </a>
                 </li>
-            @endforeach
+                @empty
+                <li class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex justify-between item-center">
+                        <p>Salta a la Creación de un curso</p>
+                        <a href="{{ route('instructor.courses.create') }}" class="btn btn-blue"> Crea tu curso</a>
+                    </div>
+
+                </li>
+            @endforelse
         </ul>
     </x-container>
 </x-instructor-layout>
