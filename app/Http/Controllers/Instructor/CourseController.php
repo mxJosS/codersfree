@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Instructor;
-use App\Models\Category; 
-use App\Models\Level;    
-use App\Models\Price;    
+use App\Models\Category;
+use App\Models\Level;
+use App\Models\Price;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
@@ -61,7 +61,7 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
-        //
+        return view ('instructor.courses.edit', compact('course'));
     }
 
     /**
