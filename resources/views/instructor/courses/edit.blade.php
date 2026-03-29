@@ -128,4 +128,13 @@
             reader.readAsDataURL(file);
         }
     </script>
+    <script src="{{ asset('vendor/ckeditor5-build-classic/build/ckeditor.js') }}"></script>
+
+<script>
+    ClassicEditor
+        .create( document.querySelector( '#summary' ) )
+        .catch( error => {
+            console.error( error );
+        } );
+</script>
 </x-instructor-layout>
