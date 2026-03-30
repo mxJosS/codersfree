@@ -7,6 +7,7 @@ use App\Models\Price;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 
 class CourseController extends Controller
@@ -72,7 +73,24 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|max:255',
+            'slug' => "required|unique:courses,slug," . $course->id,
+            'summary' => 'nullable|max:1000',
+            'description' => 'nullable',
+            'category_id' => 'required|exists:categories,id',
+            'level_id' => 'required|exists:levels,id',
+            'price_id' => 'required|exists:prices,id',
+        ]);
+        if ($request->hasFile('image')) {
+            if($course->image_path){
+                Storage::delete($course->image_path);
+            }
+            $data['image_path'] = Storage::put('courses/images', $request->file('image'));
+
+        }
+        $course->update($data);
+        return redirect()->route('instructor.courses.edit', $course)->with('info', 'Curso actualizado correctamente');
     }
 
     /**
@@ -80,6 +98,10 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
-        //
+        if ($course->image_path) {
+            Storage::delete($course->image_path);
+        }
+        $course->delete();
+        return redirect()->route('instructor.courses.index')->with('info', 'Curso eliminado correctamente');
     }
 }

@@ -16,7 +16,7 @@
                     <x-label class="mb-1">
                         Nombre del Curso
                     </x-label>
-                    <x-input placeholder="Nombre del curso" class="w-full" name="title" value="{{old('tittle')}}"  oninput="string_to_slug(this.value, '#slug')" />
+                    <x-input placeholder="Nombre del curso" class="w-full" name="title" value="{{old('title')}}"  oninput="string_to_slug(this.value, '#slug')" />
                 </div>
 
                 <div class="mb-4">

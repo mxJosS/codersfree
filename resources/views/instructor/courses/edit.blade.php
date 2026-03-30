@@ -4,137 +4,167 @@
             Curso: {{ $course->title }}
         </h2>
     </x-slot>
+
     <x-container class="py-8">
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 py-8">
             <aside class="col-span-1">
                 <h1 class="font-semibold text-xl mb-4">Edición del curso</h1>
-                <nav class="">
+                <nav class="mb-6">
                     <ul>
                         <li class="border-l-4 border-indigo-400 pl-3">
-                            <a href="{{ route('instructor.courses.edit', $course) }}">
+                            <a href="{{ route('instructor.courses.edit', $course) }}" class="font-medium text-indigo-600">
                                 Información del Curso
                             </a>
                         </li>
                     </ul>
                 </nav>
             </aside>
+
             <div class="col-span-1 lg:col-span-4">
                 <div class="card">
                     <form action="{{ route('instructor.courses.update', $course) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
-                        <p class="text-2xl font-semibold">Información del Curso</p>
 
+                        <p class="text-2xl font-semibold">Información del Curso</p>
                         <hr class="mt-2 mb-6">
 
-                        <x-validation-errors />
+                        <x-validation-errors class="mb-4" />
+
+                        {{-- Título --}}
                         <div class="mb-4">
                             <x-label value="Título del curso" class="mb-2" />
-                            <x-input type="text" class="w-full" value="{{ old('title',$course->title ) }}" name="title" />
+                            <x-input type="text" id="title" class="w-full" value="{{ old('title', $course->title) }}" name="title" onkeyup="string_to_slug(this.value, '#slug')" />
                         </div>
+
+                        {{-- Slug (Solo si no está publicado) --}}
                         @empty($course->published_at)
                             <div class="mb-4">
                                 <x-label value="Slug del curso" class="mb-2" />
-                                <x-input type="text" class="w-full" value="{{ old('slug',$course->slug ) }}" name="slug" />
+                                <x-input type="text" id="slug" class="w-full bg-gray-50" value="{{ old('slug', $course->slug) }}" name="slug" readonly />
                             </div>
                         @endempty
+
+                        {{-- Resumen --}}
                         <div class="mb-4">
-                            <x-label value="Descripción del curso" class="mb-2" />
-                            <x-textarea class="w-full resize-none" name="summary">{{ old('summary', $course->summary) }}</x-textarea>
+                            <x-label value="Resumen del curso" class="mb-2" />
+                            <x-textarea class="w-full resize-none" name="summary" rows="3">{{ old('summary', $course->summary) }}</x-textarea>
                         </div>
 
+                        {{-- Descripción (CKEditor) --}}
+                        <div class="mb-4 ckeditor">
+                            <x-label value="Descripción del curso" class="mb-2" />
+                            <x-textarea id="editor-description" class="w-full" name="description">{{ old('description', $course->description) }}</x-textarea>
+                        </div>
+
+                        {{-- Selects --}}
                         <div class="grid md:grid-cols-3 gap-4 mb-8">
                             <div>
                                 <x-label class="mb-1">Categorías</x-label>
                                 <x-select name="category_id">
                                     @foreach ($categories as $category)
-                                        <option value="{{$category->id}}" @selected(old('category_id', $course->category_id) == $category->id)>
-                                            {{$category->name}}
-                                        </option>
+                                        <option value="{{$category->id}}" @selected(old('category_id', $course->category_id) == $category->id)>{{$category->name}}</option>
                                     @endforeach
                                 </x-select>
                             </div>
-
                             <div>
                                 <x-label class="mb-1">Niveles</x-label>
                                 <x-select name="level_id">
                                     @foreach ($levels as $level)
-                                        <option value="{{$level->id}}" @selected(old('level_id', $course->level_id) == $level->id)>
-                                            {{$level->name}}
-                                        </option>
+                                        <option value="{{$level->id}}" @selected(old('level_id', $course->level_id) == $level->id)>{{$level->name}}</option>
                                     @endforeach
                                 </x-select>
                             </div>
-
                             <div>
                                 <x-label class="mb-1">Precio</x-label>
                                 <x-select name="price_id">
                                     @foreach ($prices as $price)
                                         <option value="{{$price->id}}" @selected(old('price_id', $course->price_id) == $price->id)>
-                                            @if ($price->value == 0)
-                                                Gratis
-                                            @else
-                                                {{$price->value}} US$ (nivel {{$loop->index}})
-                                            @endif
+                                            {{ $price->value == 0 ? 'Gratis' : $price->value . ' US$' }}
                                         </option>
                                     @endforeach
                                 </x-select>
                             </div>
                         </div>
 
+                        {{-- Imagen --}}
                         <div>
                             <p class="text-2xl font-semibold mb-4">Imagen del curso</p>
                             <div class="grid md:grid-cols-2 gap-4">
                                 <figure>
-                                    <img id="picture" class="w-full aspect-video object-contain object-center" src="{{ $course->image }}" alt="">
+                                    <img id="picture" class="w-full aspect-video object-contain border rounded-md" src="{{ $course->image }}" alt="Vista previa">
                                 </figure>
                                 <div>
-                                    <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Omnis delectus corporis accusamus eaque error, dolores veritatis quaerat dolore nisi obcaecati aperiam enim?</p>
-                                    <div class="flex items-center justify-center w-full mt-4">
+                                    <p class="mb-4 text-sm text-gray-600 italic">Sube una imagen atractiva. Formatos aceptados: JPG, PNG.</p>
+                                    <div class="flex items-center justify-center w-full">
                                         <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                                             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                                </svg>
-                                                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Haz clic para subir</span> o arrastra y suelta</p>
-                                                <p class="text-xs text-gray-500">PNG, JPG (MAX. 800x400px)</p>
+                                                <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-400 mb-2"></i>
+                                                <p class="text-sm text-gray-500 font-semibold">Haz clic para cambiar imagen</p>
                                             </div>
-                                            <input id="file" type="file" name="file" class="hidden" accept="image/*" />
+                                            <input id="file" type="file" name="image" class="hidden" accept="image/*" onchange="preview_image(event, '#picture')" />
                                         </label>
                                     </div>
-                                    <div class="flex justify-end mt-6">
-                                        <x-button type="submit">
-                                            Actualizar información
-                                        </x-button>
+                                    <div class="flex gap-4 justify-end mt-6">
+                                        <x-button type="submit">Actualizar información</x-button>
+                                        {{-- Botón de eliminar (dispara el JS de confirmación) --}}
+                                        <button type="button" onclick="confirmDelete()" class="btn btn-red text-sm flex items-center">
+                                            <i class="fa-solid fa-trash-can mr-2"></i> Eliminar curso
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </form>
+
+                    {{-- Formulario oculto para eliminación (FUERA del form de update) --}}
+                    <form action="{{ route('instructor.courses.destroy', $course) }}" method="POST" id="delete-form" class="hidden">
+                        @csrf
+                        @method('DELETE')
                     </form>
                 </div>
             </div>
         </div>
     </x-container>
 
-    <script>
-        document.getElementById("file").addEventListener('change', cambiarImagen);
+    {{-- SCRIPTS --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/ckeditor5-build-classic/build/ckeditor.js') }}"></script>
+    @vite(['resources/js/helpers/string_to_slug.js', 'resources/js/helpers/preview_image.js'])
 
-        function cambiarImagen(event){
-            var file = event.target.files[0];
-            var reader = new FileReader();
-            reader.onload = (event) => {
-                document.getElementById("picture").setAttribute('src', event.target.result);
-            };
-            reader.readAsDataURL(file);
+    <script>
+        // Inicializar CKEditor
+        ClassicEditor
+            .create(document.querySelector('#editor-description'))
+            .catch(error => { console.error(error); });
+
+        // Confirmación de eliminación
+        function confirmDelete() {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer y eliminará todo el curso.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sí, eliminar permanentemente',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form').submit();
+                }
+            })
         }
     </script>
-    <script src="{{ asset('vendor/ckeditor5-build-classic/build/ckeditor.js') }}"></script>
 
-<script>
-    ClassicEditor
-        .create( document.querySelector( '#summary' ) )
-        .catch( error => {
-            console.error( error );
-        } );
-</script>
+    @if (session('info'))
+        <script>
+            Swal.fire({
+                title: '¡Operación exitosa!',
+                text: "{{ session('info') }}",
+                icon: 'success',
+                confirmButtonColor: '#4F46E5',
+            });
+        </script>
+    @endif
 </x-instructor-layout>
