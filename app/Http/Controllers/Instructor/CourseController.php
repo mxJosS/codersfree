@@ -104,4 +104,9 @@ class CourseController extends Controller
         $course->delete();
         return redirect()->route('instructor.courses.index')->with('info', 'Curso eliminado correctamente');
     }
+
+    public function video(Course $course)
+    {
+        return view('instructor.courses.video', compact('course'));
+    }
 }
