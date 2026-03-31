@@ -14,8 +14,7 @@ class PromotionalVideo extends Component
 
     public $course;
 
-
-    #[Validate('required|file|mimetypes:video/mp4,video/x-matroska,video/quicktime|max:512000')]
+    #[Validate('required|file|mimes:mp4,mov,avi,mkv,wmv|max:512000')]
     public $video;
 
     public function mount(Course $course)
@@ -27,12 +26,16 @@ class PromotionalVideo extends Component
     {
         $this->validate();
 
-
         $this->course->video_path = $this->video->store('courses/promotional-videos', 'public');
         $this->course->save();
 
-
         $this->dispatch('saved');
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '¡Video publicado!',
+            'text' => 'El video promocional se ha subido con éxito.'
+        ]);
 
         $this->reset('video');
     }
@@ -41,17 +44,16 @@ class PromotionalVideo extends Component
     {
         return view('livewire.instructor.courses.promotional-video');
     }
+
     public function destroy()
     {
-    if ($this->course->video_path)
-        {
-
+        if ($this->course->video_path) {
             Storage::disk('public')->delete($this->course->video_path);
             $this->course->video_path = null;
             $this->course->save();
             $this->course->refresh();
-            $this->dispatch('swal',
-            [
+
+            $this->dispatch('swal', [
                 'icon' => 'success',
                 'title' => '¡Eliminado!',
                 'text' => 'El video ha sido borrado correctamente.'
