@@ -18,7 +18,7 @@ class Goals extends Component
     public function mount(Course $course)
     {
         $this->course = $course;
-        $this->goals = $course->goals->toArray();
+        $this->goals = $course->goals()->get()->toArray();
     }
 
     public function store()
@@ -55,6 +55,19 @@ class Goals extends Component
             'icon' => 'success',
             'title' => '¡Actualizado!',
             'text' => 'Las metas se han actualizado correctamente.'
+        ]);
+    }
+
+    public function destroy(Goal $goal)
+    {
+        $goal->delete();
+
+        $this->goals = $this->course->goals()->get()->toArray();
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '¡Eliminado!',
+            'text' => 'La meta ha sido eliminada correctamente.'
         ]);
     }
 
