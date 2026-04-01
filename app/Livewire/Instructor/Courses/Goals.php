@@ -10,6 +10,7 @@ use App\Models\Course;
 class Goals extends Component
 {
     public Course $course;
+    public $goals = [];
 
     #[Validate('required|string|max:255')]
     public $name;
@@ -17,17 +18,19 @@ class Goals extends Component
     public function mount(Course $course)
     {
         $this->course = $course;
+        $this->goals = $course->goals->toArray();
     }
 
     public function store()
     {
-        $this->validate();
+        $this->validateOnly('name');
 
         $this->course->goals()->create([
             'name' => $this->name
         ]);
 
         $this->reset('name');
+        $this->goals = $this->course->goals()->get()->toArray();
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -36,10 +39,27 @@ class Goals extends Component
         ]);
     }
 
+    public function update()
+    {
+        $this->validate([
+            'goals.*.name' => 'required|string|max:255'
+        ]);
+
+        foreach ($this->goals as $goalData) {
+            Goal::where('id', $goalData['id'])->update([
+                'name' => $goalData['name']
+            ]);
+        }
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '¡Actualizado!',
+            'text' => 'Las metas se han actualizado correctamente.'
+        ]);
+    }
+
     public function render()
     {
-        $goals = $this->course->goals()->get();
-
-        return view('livewire.instructor.courses.goals', compact('goals'));
+        return view('livewire.instructor.courses.goals');
     }
 }

@@ -11,10 +11,14 @@
             'name' => 'Meta 2'
         ]
     ] --}}
-    <ul class="space-y-2 mb-8">
-        @foreach ($goals as $goal)
-            <li wire:key="goal-{{ $goal->id }}" class="flex items-center gap-2">
-                <x-input class="w-full" value="{{ $goal->name }}" readonly />
+    <ul class="space-y-2 mb-4">
+        @foreach ($goals as $index => $goal)
+            <li wire:key="goal-{{ $goal['id'] }}" class="flex items-center gap-2">
+
+                <x-input
+                    wire:model="goals.{{ $index }}.name"
+                    class="w-full"
+                />
 
                 <button type="button" class="text-red-500 p-2">
                     <i class="fa-solid fa-trash"></i>
@@ -23,22 +27,20 @@
         @endforeach
     </ul>
 
+    <div class="flex justify-end mb-8">
+        <x-button wire:click="update">
+            Actualizar
+        </x-button>
+    </div>
 
+    <form wire:submit.prevent="store">
+        <x-input wire:model="name" class="w-full" placeholder="Ingrese el nombre de la meta" />
+        <x-input-error for="name" />
 
-    <form wire:submit="store">
-        <div class="bg-gray-100 rounded-lg shadow-lg p-6">
-            <x-label class="mb-2">
-                Nueva meta
-            </x-label>
-
-            <x-input wire:model="name" class="w-full" placeholder="Ingrese la nueva meta">
-            </x-input>
-            <x-input-error for="name" class="mt-2" />
-            <div class="flex justify-end mt-4">
-                <x-button class="mt-4" wire:click="store">
-                    Agregar meta
-                </x-button>
-            </div>
+        <div class="flex justify-end mt-2">
+            <x-button>
+                Agregar meta
+            </x-button>
         </div>
     </form>
 
