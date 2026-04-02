@@ -18,19 +18,31 @@ class Goals extends Component
     public function mount(Course $course)
     {
         $this->course = $course;
-        $this->goals = $course->goals()->get()->toArray();
+        $this->getGoals();
+    }
+
+    public function getGoals()
+    {
+        $this->goals = $this->course->goals()
+            ->orderBy('order', 'asc')
+            ->get()
+            ->keyBy('id')
+            ->toArray();
     }
 
     public function store()
     {
         $this->validateOnly('name');
 
+        $lastOrder = $this->course->goals()->max('order') ?? 0;
+
         $this->course->goals()->create([
-            'name' => $this->name
+            'name' => $this->name,
+            'order' => $lastOrder + 1
         ]);
 
         $this->reset('name');
-        $this->goals = $this->course->goals()->get()->toArray();
+        $this->getGoals();
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -45,11 +57,13 @@ class Goals extends Component
             'goals.*.name' => 'required|string|max:255'
         ]);
 
-        foreach ($this->goals as $goalData) {
-            Goal::where('id', $goalData['id'])->update([
+        foreach ($this->goals as $id => $goalData) {
+            Goal::where('id', $id)->update([
                 'name' => $goalData['name']
             ]);
         }
+
+        $this->getGoals();
 
         $this->dispatch('swal', [
             'icon' => 'success',
@@ -61,13 +75,30 @@ class Goals extends Component
     public function destroy(Goal $goal)
     {
         $goal->delete();
-
-        $this->goals = $this->course->goals()->get()->toArray();
+        $this->getGoals();
 
         $this->dispatch('swal', [
             'icon' => 'success',
             'title' => '¡Eliminado!',
             'text' => 'La meta ha sido eliminada correctamente.'
+        ]);
+    }
+
+    public function reorder($goalsData)
+    {
+        foreach ($goalsData as $data) {
+            Goal::where('id', $data['id'])->update([
+                'name' => $data['name'],
+                'order' => $data['order']
+            ]);
+        }
+
+        $this->getGoals();
+
+        $this->dispatch('swal', [
+            'icon' => 'success',
+            'title' => '¡Sincronizado!',
+            'text' => 'El orden y los cambios se han guardado.'
         ]);
     }
 
