@@ -1,4 +1,7 @@
 <div>
+    <p class="text-2xl font-semibold">Metas del Curso</p>
+    <hr class="mt-2 mb-6">
+
     @if (count($goals))
         <ul class="space-y-3 mb-4" id="goals">
             @foreach ($goals as $goalId => $goal)

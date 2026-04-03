@@ -34,11 +34,27 @@
                     <x-textarea class="w-full resize-none" name="summary" rows="3">{{ old('summary', $course->summary) }}</x-textarea>
                 </div>
 
-                <div class="mb-4 ckeditor">
+                <div class="mb-4">
                     <x-label value="Descripción del curso" class="mb-2" />
-                    <x-textarea id="editor-description" class="w-full" name="description">{{ old('description', $course->description) }}</x-textarea>
-                </div>
+                    <div wire:ignore x-data="{
+                        init() {
+                            // Limpiamos la basura del caché de Livewire
+                            let oldUI = this.$el.querySelector('.ck-editor');
+                            if (oldUI) {
+                                oldUI.remove();
+                            }
 
+                            // Mostramos el textarea base
+                            this.$refs.myEditor.style.display = 'block';
+
+                            // Inicializamos un editor completamente nuevo
+                            ClassicEditor.create(this.$refs.myEditor)
+                                .catch(error => console.error('Error CKEditor:', error));
+                        }
+                    }">
+                        <x-textarea x-ref="myEditor" id="editor-description" class="w-full" name="description">{{ old('description', $course->description) }}</x-textarea>
+                    </div>
+                </div>
                 <div class="grid md:grid-cols-3 gap-4 mb-8">
                     <div>
                         <x-label class="mb-1">Categorías</x-label>
@@ -103,15 +119,9 @@
         </x-instructor.course-sidebar>
     </x-container>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('vendor/ckeditor5-build-classic/build/ckeditor.js') }}"></script>
     @vite(['resources/js/helpers/string_to_slug.js', 'resources/js/helpers/preview_image.js'])
 
     <script>
-        ClassicEditor
-            .create(document.querySelector('#editor-description'))
-            .catch(error => { console.error(error); });
-
         function confirmDelete() {
             Swal.fire({
                 title: '¿Estás seguro?',

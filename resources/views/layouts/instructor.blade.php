@@ -42,16 +42,17 @@
 
         @livewireScripts
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="{{ asset('vendor/ckeditor5-build-classic/build/ckeditor.js') }}"></script>
 
         <script>
+            // Solo dejamos el manejador de alertas de éxito global
             window.addEventListener('swal', function(event) {
                 const detail = Array.isArray(event.detail) ? event.detail[0] : event.detail;
-
                 Swal.fire({
                     title: detail.title || "¡Hecho!",
                     text: detail.text || "Operación exitosa",
                     icon: detail.icon || "success",
-                    draggable: true
+                    confirmButtonColor: '#4F46E5',
                 });
             });
         </script>

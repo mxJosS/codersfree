@@ -1,4 +1,7 @@
 <div>
+    <p class="text-2xl font-semibold">Requisitos del Curso</p>
+    <hr class="mt-2 mb-6">
+
     @if (count($requirements))
         <ul class="space-y-3 mb-4" id="requirements-list">
             @foreach ($requirements as $requirementId => $requirement)
