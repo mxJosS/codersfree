@@ -29,7 +29,41 @@
             </li>
         @empty
             <li class="bg-gray-50 rounded-lg px-4 py-8 sm:px-6 sm:py-10 text-center border-2 border-dashed border-gray-300 ignore-sort">
-                </li>
+            </li>
         @endforelse
     </ul>
 </div>
+
+@push('js')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.7/Sortable.min.js"></script>
+<script>
+    function initSortable() {
+        const sortableList = document.querySelector('[x-ref="sortableList"]');
+        if (!sortableList) {
+            return;
+        }
+
+        if (sortableList.sortableInstance) {
+            sortableList.sortableInstance.destroy();
+        }
+
+        sortableList.sortableInstance = Sortable.create(sortableList, {
+            animation: 200,
+            ghostClass: 'bg-gray-200',
+            handle: '.drag-handle',
+            filter: '.ignore-sort',
+            onEnd: () => {
+                const items = Array.from(sortableList.querySelectorAll('li[data-id]')).map(li => li.getAttribute('data-id'));
+
+                @this.updateSortOrder(items);
+            }
+        });
+    }
+
+    document.addEventListener('livewire:load', initSortable);
+    document.addEventListener('livewire:update', initSortable);
+
+
+    initSortable();
+</script>
+@endpush

@@ -7,7 +7,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use App\Models\Lesson;
-
+use App\Rules\UniqueLessonCourse;
 class ManageLessons extends Component
 {
     use WithFileUploads;
@@ -27,8 +27,8 @@ class ManageLessons extends Component
     public function rules()
     {
         $rules = [
-            'lessonCreate.name' => 'required',
-            'lessonCreate.slug' => 'required',
+            'lessonCreate.name' => ['required', 'max:255', new UniqueLessonCourse($this->section->course_id)],
+            'lessonCreate.slug' => ['required', new UniqueLessonCourse($this->section)],
         ];
 
         if ($this->lessonCreate['platform'] == 1) {
